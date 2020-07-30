@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>博客分类</title>
+    <script type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/static/blogclass.js"></script>
+</head>
+<body>
+    <div style="horiza-align: center; width:100%;" align="center">
+    <form action="/classlist/" method="post" name="classForm">
+         <div>
+             类型名称:<input name="className" type="text" />
+             <input value="清除" type="button" onclick="clearSearch()"/>
+             <input value="查询" type="submit"/>
+             <input type="hidden" name="currentPage" value="1" />
+             <input type="hidden" name="classId" />
+             <input type="hidden" name="opr" value="search" />
+         </div>
+    <table border="1" width="800">
+        <thead>
+            <tr>
+                <th>选项</th>
+                <th>类别ID</th>
+                <th>类别名称</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody id="bodyData">
+
+        </tbody>
+        <tfoot id="pageData">
+
+        </tfoot>
+    </table>
+    </form>
+</div>
+</body>
+</html>
