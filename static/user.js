@@ -1,4 +1,5 @@
 function checkUserName(){
+
     uName = document.regForm.userName.value
     // $.==jQuery. JSON对象
     //jsonObj = {a:1, b:2}

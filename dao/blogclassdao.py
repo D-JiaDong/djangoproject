@@ -13,6 +13,7 @@ class BlogClassDao(BaseDao):
         sql = "insert into t_blogclass (classname) " \
               "values(%s)"
         result = self.execute(sql, params)
+        print(result)
         return result
         pass
 

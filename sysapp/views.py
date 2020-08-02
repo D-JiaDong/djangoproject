@@ -67,4 +67,3 @@ def getUserList(request):
     userDao.commit()
     userDao.close()
     return render(request,'sysmgr/userinfo.html',{'userList':userList,'params': params})
-    pass

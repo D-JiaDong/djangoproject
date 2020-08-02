@@ -11,7 +11,9 @@ def goBlogClass(request):
 
 
 def getBlogClass(request):
-    dictObj = json.loads(request.body.decode('utf-8'))
+    dictObj = json.loads(request.body.decode('utf-8'),strict=False)
+    print("11111")
+    print(dictObj)
 
     # 获取查询条件
     className = dictObj.get('className', '')
@@ -21,10 +23,10 @@ def getBlogClass(request):
     pageSize = dictObj.get('pageSize', 0)
     currentPage = dictObj.get('currentPage', 0)
 
-    if pageSize == 0 or pageSize == '':
-        pageSize = 5
+    if pageSize == 0 or pageSize == "":
+        pageSize = 3
         pass
-    if currentPage == 0 or currentPage == '':
+    if currentPage == 0 or currentPage == "":
         currentPage = 1
         pass
 
@@ -36,28 +38,45 @@ def getBlogClass(request):
               'currentPage': int(currentPage)}
 
     if opr == 'delClass':
-        result = classDao.removeclass([classId])
+        result = classDao.removeClass([classId])
         params['result'] = result
         pass
 
-    if opr == 'updateClass':
+    if opr == 'update':
         uClass = classDao.findClassByClassId([classId])
+        return HttpResponse(json.dumps({'params': params, 'uClass': uClass}), content_type='application/json')
         pass
 
+    # 提交修改用户的个人信息
     if opr == 'submitUpdate':
-        result = classDao.updateClass([className, classId])
+        uName = dictObj.get('uName', '')
+        result = classDao.updateClass([uName, classId])
+        #点击保存只显示修改的单条信息
+        #params['className']=uName
+        pass
+
+    if opr == 'add':
+        aName = dictObj.get('aName', '')
+        print(aName)
+        result = classDao.createClass([aName])
+        classDao.commit()
         pass
 
     counts = classDao.findClassCounts(params)
-    totalPage = counts // int(pageSize) if counts % int(pageSize) == 0 else counts // int(pageSize)+1
+    totalPage = counts // int(pageSize) if counts % int(pageSize) == 0 else counts // int(pageSize) + 1
+    print(totalPage)
     params['counts'] = counts
     params['totalPage'] = totalPage
-    startRow = (int(currentPage)-1)*int(pageSize)
+    currentPage = int(currentPage) if int(currentPage) < totalPage else totalPage
+    currentPage = 1 if currentPage <= 0 else currentPage
+    params['currentPage'] = currentPage
+    # 计算两个值：startRow
+    startRow = (int(currentPage) - 1) * int(pageSize)
     params['startRow'] = startRow
     classList = classDao.findPageClassList(params)
     classDao.close()
 
-    return HttpResponse(json.dumps({'data': classList, 'params': params}), content_type='application/json')
+    return HttpResponse(json.dumps({'data': classList, 'params': params},ensure_ascii=False), content_type='application/json')
     pass
 
 
