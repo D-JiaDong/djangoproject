@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     # 'loginapp.apps.LoginappConfig',
     'authapp.apps.AuthappConfig',
     'blogapp.apps.BlogappConfig',
+    'dbmodels.apps.DbmodelsConfig',
 ]
 
 MIDDLEWARE = [

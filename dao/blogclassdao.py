@@ -47,6 +47,19 @@ class BlogClassDao(BaseDao):
         return resultSet[0]['counts']
         pass
 
+    def findAllClassList(self, params={}):
+        sql = "select * from t_blogclass where 1=1 "  # %s是占位符
+        searchParams = []
+        if params.get('className'):
+            sql += ' and className like %s'
+            searchParams.append('%' + params.get('className') + "%")
+            pass
+
+        self.execute(sql, searchParams)  #
+        resultSet = self.fetch()
+        return resultSet
+        pass
+
     def removeClass(self, params):
         sql = "delete from t_blogclass where classid=%s "  # %s是占位符
         result = self.execute(sql, params)  #

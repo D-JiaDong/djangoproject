@@ -1,9 +1,8 @@
 from django.shortcuts import HttpResponse, render
 from dao.blogclassdao import BlogClassDao
+from dbmodels.models import TBlog, TBlogclass, TUser
 import json
 # Create your views here.
-
-# AJAX异步技术实现CURD
 
 def goBlogClass(request):
     return render(request, 'blog/blogclass.html')
@@ -78,6 +77,100 @@ def getBlogClass(request):
 
     return HttpResponse(json.dumps({'data': classList, 'params': params},ensure_ascii=False), content_type='application/json')
     pass
+
+
+# 博客管理
+def goBlogList(request):
+    return render(request, 'blog/blog.html')
+    pass
+# AJAX异步技术实现CRUD
+def blogList(request):
+    dictObj = json.loads(request.body.decode('utf-8')) # {'classid':1, 'className': 'Python', 'opr':'del'}
+
+    # 获取查询条件
+    blogTitle = dictObj.get('blogTitle', '')
+    blogState = dictObj.get('blogState', '')
+    blogId = dictObj.get('blogId', '')
+    opr = dictObj.get('opr', '')
+    pageSize = dictObj.get('pageSize', 0)
+    currentPage = dictObj.get('currentPage', 0)
+
+    if pageSize == 0 or pageSize == "":
+        pageSize = 10
+        pass
+    if currentPage == 0 or currentPage == "":
+        currentPage = 1
+        pass
+
+    tBlog = TBlog()
+
+    params = {'className': blogTitle,
+              'classState': blogState,
+              'pageSize': int(pageSize),
+              'currentPage': int(currentPage)}
+
+    # ORM实现删除功能
+    if opr == 'delClass':
+        tBlog.blogid = blogId    # 将id赋值为tBlog模型对象
+        result = tBlog.delete()  #  delete from t_blog where blogid=blogId
+        params['result'] = result
+        pass
+
+    # 查询博客信息
+    if opr == 'update':
+        uBlog = TBlog.objects.filter(blogid=blogId).values('blogid', 'blogtitle', 'blogcontent', 'blogtips')
+        # select blogid, blogtitle, blogcontent, blogtips from t_blog where blogid=1
+        return HttpResponse(json.dumps({'params': params, 'uBlog': uBlog[0]}), content_type='application/json')
+        pass
+
+    # 提交修改用户的个人信息
+    if opr == 'submitUpdate':
+        uName = dictObj.get('uName', '')
+        result = TBlog.objects.filter(blogid=blogId).update(blogtitle=blogTitle, blogstate=blogState)
+        pass
+
+    if opr == 'add':
+        aName = dictObj.get('aName', '')
+        result = TBlog.objects.create(blogtitle=blogTitle, blogstate=blogState)
+        pass
+
+    querySet = TBlog.objects
+    if blogTitle:
+        querySet.filter(blogtitle__contains=blogTitle)
+        pass
+    if blogState:
+        querySet.filter(blogState=blogState)
+        pass
+
+    # 计算两个值：startRow
+    startRow = (int(currentPage) - 1) * int(pageSize)
+    endRow = int(currentPage)* int(pageSize)
+    params['startRow'] = startRow
+
+    blogList = list(querySet.values('blogid', 'blogtitle', 'blogstate')[startRow: endRow])
+    counts = querySet.count()
+    totalPage = counts // int(pageSize) if counts % int(pageSize) == 0 else counts // int(pageSize) + 1
+    params['counts'] = counts
+    params['totalPage'] = totalPage
+    currentPage = int(currentPage) if int(currentPage)<totalPage else totalPage
+    currentPage = 1 if currentPage <= 0 else currentPage
+    params['currentPage'] = currentPage
+
+
+    return HttpResponse(json.dumps({'data': blogList, 'params': params}), content_type='application/json')
+    pass
+
+def goWriteBlog(request):
+    return render(request, 'blog/writeblog.html')
+    pass
+
+def goUpdateBlog(request):
+    blogId = request.GET.get('blogId', 0)
+    params = {}
+    params['blogId'] = blogId
+    return render(request, 'blog/updateblog.html', {'params': params})
+    pass
+
 
 
 
