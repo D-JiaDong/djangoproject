@@ -96,14 +96,13 @@ def blogList(request):
     currentPage = dictObj.get('currentPage', 0)
 
     if pageSize == 0 or pageSize == "":
-        pageSize = 10
+        pageSize = 3
         pass
     if currentPage == 0 or currentPage == "":
         currentPage = 1
         pass
 
     tBlog = TBlog()
-
     params = {'className': blogTitle,
               'classState': blogState,
               'pageSize': int(pageSize),
@@ -134,21 +133,30 @@ def blogList(request):
         result = TBlog.objects.create(blogtitle=blogTitle, blogstate=blogState)
         pass
 
-    querySet = TBlog.objects
-    if blogTitle:
-        querySet.filter(blogtitle__contains=blogTitle)
-        pass
-    if blogState:
-        querySet.filter(blogState=blogState)
-        pass
-
     # 计算两个值：startRow
     startRow = (int(currentPage) - 1) * int(pageSize)
-    endRow = int(currentPage)* int(pageSize)
+    endRow = int(currentPage) * int(pageSize)
     params['startRow'] = startRow
 
-    blogList = list(querySet.values('blogid', 'blogtitle', 'blogstate')[startRow: endRow])
-    counts = querySet.count()
+    counts=None
+    blogList=[]
+    querySet = TBlog.objects
+    if blogTitle and blogState:
+        print(blogTitle)
+        # blogtitle__contains 模糊查询
+        blogList = list(querySet.filter(blogtitle__contains=blogTitle,blogstate=blogState).values('blogid', 'blogtitle', 'blogstate')[startRow: endRow])
+        counts = querySet.count()
+        pass
+    elif blogState:
+        blogList = list(querySet.filter(blogstate=blogState).values('blogid', 'blogtitle','blogstate')[startRow: endRow])
+        counts = querySet.count()
+        pass
+    else:
+        blogList = list(querySet.filter(blogtitle__contains=blogTitle).values('blogid', 'blogtitle','blogstate')[startRow: endRow])
+        counts = querySet.count()
+        pass
+
+
     totalPage = counts // int(pageSize) if counts % int(pageSize) == 0 else counts // int(pageSize) + 1
     params['counts'] = counts
     params['totalPage'] = totalPage
