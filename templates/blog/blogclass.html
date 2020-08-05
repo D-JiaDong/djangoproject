@@ -47,8 +47,17 @@
             <tbody id="bodyData">
 
             </tbody>
-            <tfoot id="pageData">
-            </tfoot>
+{#            <tfoot id="pageData">#}
+{#            </tfoot>#}
+             <tfoot id="pageData">
+            <tr align="right">
+                <td colspan="8" >
+                    <div style="float: right"><select name="pageSize" id="pagenum"></select></div>
+                    <div style="float: right" id="pagechoose" ></div>
+                    </select>
+                </td>
+            </tr>
+        </tfoot>
         </table>
     </div>
     <div class="modal fade" id="modal-update">

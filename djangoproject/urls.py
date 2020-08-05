@@ -42,7 +42,7 @@ urlpatterns = [
     path('gobloglist/', blogview.goBlogList),
     path('bloglist/', blogview.blogList),
 
-    # path('gowriteblog/', blogview.goWriteBlog),
+    path('gowriteblog/', blogview.goWriteBlog),
     # path('upload/', blogview.uploadFile),
     path('goupdateblog/', blogview.goUpdateBlog),
     # path('goindex/', authview.goIndex),

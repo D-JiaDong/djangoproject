@@ -15,7 +15,6 @@ function blog(pageSize, currentPage, blogId, opr){
        //这里的代码块可以基于某种原因处理这个异常，也可以忽略这个异常，还可以通过throw语句重新抛出异常
    }
     state = 0
-    alert("blog运行")
     if(opr == 'publish'){
         state = 1
     }else if(opr == 'cancel'){
@@ -41,7 +40,6 @@ function blog(pageSize, currentPage, blogId, opr){
                 } else {
                     bodyObj = $('#bodyData')
                     params = data.params
-                    alert(params.pageSize == '20')
                     text = ""
                     bodyObj.empty()
                     for (i = 0; i < data.data.length; i++) {
@@ -95,12 +93,14 @@ function blog(pageSize, currentPage, blogId, opr){
                         '                        <option value=\'50\' >50</option>' +
                         '                        <option value=\'100\'>100</option>'
                     foot_fy_Obj.append(pageText)
+
+
+
                     var obj = document.getElementById('pagenum');
                     for (i = 0; i < obj.length; i++) {
                         if (obj[i].value == params.pageSize)
                             obj[i].selected = true;
                     }
-                    alert(pageText)
                     document.classForm.currentPage.value = params.currentPage
                     }
                 }
