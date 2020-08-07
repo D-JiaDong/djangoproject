@@ -10,15 +10,16 @@ from django.db import models
 class TBlog(models.Model):
     blogid = models.AutoField(primary_key=True)
     blogtitle = models.CharField(max_length=45, blank=True, null=True)
-    bolgcontent = models.TextField(blank=True, null=True)
+    blogcontent = models.TextField(blank=True, null=True)
     blogtips = models.CharField(max_length=45, blank=True, null=True)
     blogdate = models.DateTimeField(blank=True, null=True)
     userid = models.ForeignKey('TUser', models.DO_NOTHING, db_column='userid', blank=True, null=True)
     classid = models.ForeignKey('TBlogclass', models.DO_NOTHING, db_column='classid', blank=True, null=True)
     blogstate = models.IntegerField(blank=True, null=True)
+    blogsummary = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = 't_blog'
 
 

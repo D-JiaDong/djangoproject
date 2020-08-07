@@ -1,6 +1,6 @@
 from django.shortcuts import HttpResponse, render
 from dao.blogclassdao import BlogClassDao
-from dbmodels.models import TBlog, TBlogclass, TUser
+from dbmodels.models import TBlog, TBlogclass
 import json
 # Create your views here.
 
@@ -90,6 +90,9 @@ def blogList(request):
     # 获取查询条件
     blogTitle = dictObj.get('blogTitle', '')
     blogState = dictObj.get('blogState', '')
+    blogContent = dictObj.get('blogContent', '')
+    blogTips = dictObj.get('blogTips', '')
+    blogClassId = dictObj.get('blogClassId', '')
     blogId = dictObj.get('blogId', '')
     opr = dictObj.get('opr', '')
     pageSize = dictObj.get('pageSize', 0)
@@ -103,10 +106,14 @@ def blogList(request):
         pass
 
     tBlog = TBlog()
-    params = {'className': blogTitle,
-              'classState': blogState,
+    blogClassDao = BlogClassDao()
+    blogClassList = blogClassDao.findAllClassList()
+
+    params = {'blogTitle': blogTitle,
+              'blogState': blogState,
               'pageSize': int(pageSize),
-              'currentPage': int(currentPage)}
+              'currentPage': int(currentPage),
+              'blogClassList': blogClassList}
 
     # ORM实现删除功能
     if opr == 'delClass':
@@ -114,7 +121,6 @@ def blogList(request):
         result = tBlog.delete()  #  delete from t_blog where blogid=blogId
         params['result'] = result
         pass
-
     # 查询博客信息
     if opr == 'update':
         uBlog = TBlog.objects.filter(blogid=blogId).values('blogid', 'blogtitle', 'blogcontent', 'blogtips')
@@ -128,9 +134,41 @@ def blogList(request):
         result = TBlog.objects.filter(blogid=blogId).update(blogtitle=blogTitle, blogstate=blogState)
         pass
 
+    # if opr == 'add':
+    #     aName = dictObj.get('aName', '')
+    #     result = TBlog.objects.create(blogtitle=blogTitle, blogstate=blogState)
+    #     pass
+    if opr == 'goAdd':
+        return HttpResponse(json.dumps({'params': params}), content_type='application/json')
+        pass
     if opr == 'add':
-        aName = dictObj.get('aName', '')
-        result = TBlog.objects.create(blogtitle=blogTitle, blogstate=blogState)
+        # 是类别信息
+        tBlogclass = TBlogclass()
+        tBlogclass.classid = int(blogClassId)
+
+        # 摘要信息
+        blogsummary = blogContent[0:300].replace('<p>', '')
+        blogsummary = blogsummary.replace('</p>', '')
+
+        # # 用户信息
+        # tUser = TUser()
+        # sessionUser = request.session['user']
+        # tUser.userid = sessionUser['userId']
+
+        print(blogContent)
+        # ORM框架的外键列必须传对象
+        result = TBlog.objects.create(blogtitle=blogTitle,
+                                      blogcontent=blogContent,
+                                      blogtips=blogTips,
+                                      blogsummary=blogsummary,
+                                      classid=tBlogclass,
+                                      # userid=tUser,
+                                      blogstate=blogState)
+        if result:
+            return HttpResponse(json.dumps({'result': 1}), content_type='application/json')
+        else:
+            return HttpResponse(json.dumps({'result': 0}), content_type='application/json')
+            pass
         pass
 
     # 计算两个值：startRow
@@ -168,6 +206,7 @@ def blogList(request):
     return HttpResponse(json.dumps({'data': blogList, 'params': params}), content_type='application/json')
     pass
 
+#写博客页面
 def goWriteBlog(request):
     return render(request, 'blog/writeblog.html')
     pass
@@ -177,6 +216,27 @@ def goUpdateBlog(request):
     params = {}
     params['blogId'] = blogId
     return render(request, 'blog/updateblog.html', {'params': params})
+    pass
+
+import os
+import uuid
+# 文件上传功能
+def uploadFile(request):
+    # 后缀需要检查的
+    file = request.FILES.get('upload')
+    if file:
+        fileName = str(uuid.uuid4()) +  file.name # 避免文件名称冲突
+        try:
+            with open(os.path.dirname(__file__) + os.sep + '..' + os.sep + 'static' + os.sep + 'upload'+ os.sep + fileName, "wb+") as fp:
+                for chunk in file.chunks():
+                    fp.write(chunk)
+                    pass
+        except Exception as e:
+            return HttpResponse(json.dumps({'uploaded': 0, 'fileName': "", 'url': ""}), content_type="application/json")
+            pass
+        return  HttpResponse(json.dumps({'uploaded': 1, 'fileName':fileName, 'url': os.sep + 'static' + os.sep + 'upload'+ os.sep + fileName}), content_type="application/json")
+    else:
+        return  HttpResponse(json.dumps({'uploaded': 0, 'fileName': "", 'url': ""}), content_type="application/json")
     pass
 
 
