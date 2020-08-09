@@ -18,6 +18,7 @@ function blog(pageSize, currentPage, blogId, opr){
     if(opr == 'publish'){
         state = 1
     }else if(opr == 'cancel'){
+        alert(4)
         state = 4
     }
     //  $ == jQuery  JSON对象

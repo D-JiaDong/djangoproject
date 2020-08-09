@@ -1,6 +1,6 @@
 from django.shortcuts import HttpResponse, render
 from dao.blogclassdao import BlogClassDao
-from dbmodels.models import TBlog, TBlogclass
+from dbmodels.models import TBlog, TBlogclass,TUser
 import json
 # Create your views here.
 
@@ -87,6 +87,7 @@ def goBlogList(request):
 def blogList(request):
     dictObj = json.loads(request.body.decode('utf-8')) # {'classid':1, 'className': 'Python', 'opr':'del'}
 
+
     # 获取查询条件
     blogTitle = dictObj.get('blogTitle', '')
     blogState = dictObj.get('blogState', '')
@@ -114,7 +115,9 @@ def blogList(request):
               'pageSize': int(pageSize),
               'currentPage': int(currentPage),
               'blogClassList': blogClassList}
-
+    if opr == 'publish' or opr == 'cancel':
+        result = TBlog.objects.filter(blogid=blogId).update(blogstate=blogState)
+        pass
     # ORM实现删除功能
     if opr == 'delClass':
         tBlog.blogid = blogId    # 将id赋值为tBlog模型对象
@@ -128,10 +131,26 @@ def blogList(request):
         return HttpResponse(json.dumps({'params': params, 'uBlog': uBlog[0]}), content_type='application/json')
         pass
 
-    # 提交修改用户的个人信息
     if opr == 'submitUpdate':
-        uName = dictObj.get('uName', '')
-        result = TBlog.objects.filter(blogid=blogId).update(blogtitle=blogTitle, blogstate=blogState)
+        tBlogclass = TBlogclass()
+        tBlogclass.classid = int(blogClassId)
+
+        # 摘要信息
+        blogsummary = blogContent[0:300].replace('<p>', '')
+        blogsummary = blogsummary.replace('</p>', '')
+
+        result = TBlog.objects.filter(blogid=blogId).update(blogtitle=blogTitle,
+                                                            blogcontent=blogContent,
+                                                            blogtips=blogTips,
+                                                            blogsummary=blogsummary,
+                                                            classid=tBlogclass,
+                                                            blogstate=blogState)
+        if result:
+            return HttpResponse(json.dumps({'result': 1}), content_type='application/json')
+        else:
+            return HttpResponse(json.dumps({'result': 0}), content_type='application/json')
+            pass
+
         pass
 
     # if opr == 'add':
@@ -150,10 +169,11 @@ def blogList(request):
         blogsummary = blogContent[0:300].replace('<p>', '')
         blogsummary = blogsummary.replace('</p>', '')
 
-        # # 用户信息
-        # tUser = TUser()
-        # sessionUser = request.session['user']
-        # tUser.userid = sessionUser['userId']
+        # 用户信息
+        print(request.session['user'])
+        tUser = TUser()
+        sessionUser = request.session['user']
+        tUser.userid = sessionUser['userId']
 
         print(blogContent)
         # ORM框架的外键列必须传对象
@@ -162,7 +182,7 @@ def blogList(request):
                                       blogtips=blogTips,
                                       blogsummary=blogsummary,
                                       classid=tBlogclass,
-                                      # userid=tUser,
+                                      userid=tUser,
                                       blogstate=blogState)
         if result:
             return HttpResponse(json.dumps({'result': 1}), content_type='application/json')
@@ -182,15 +202,33 @@ def blogList(request):
     if blogTitle and blogState:
         print(blogTitle)
         # blogtitle__contains 模糊查询
-        blogList = list(querySet.filter(blogtitle__contains=blogTitle,blogstate=blogState).values('blogid', 'blogtitle', 'blogstate')[startRow: endRow])
+        blogList = list(querySet.filter(blogtitle__contains=blogTitle,blogstate=blogState).values('blogid',
+                                    'blogtitle',
+                                    'blogsummary',
+                                    'blogtips',
+                                    'userid__username',
+                                    'classid__classname',
+                                    'blogstate')[startRow: endRow])
         counts = querySet.count()
         pass
     elif blogState:
-        blogList = list(querySet.filter(blogstate=blogState).values('blogid', 'blogtitle','blogstate')[startRow: endRow])
+        blogList = list(querySet.filter(blogstate=blogState).values('blogid',
+                                    'blogtitle',
+                                    'blogsummary',
+                                    'blogtips',
+                                    'userid__username',
+                                    'classid__classname',
+                                    'blogstate')[startRow: endRow])
         counts = querySet.count()
         pass
     else:
-        blogList = list(querySet.filter(blogtitle__contains=blogTitle).values('blogid', 'blogtitle','blogstate')[startRow: endRow])
+        blogList = list(querySet.filter(blogtitle__contains=blogTitle).values('blogid',
+                                    'blogtitle',
+                                    'blogsummary',
+                                    'blogtips',
+                                    'userid__username',
+                                    'classid__classname',
+                                    'blogstate')[startRow: endRow])
         counts = querySet.count()
         pass
 
