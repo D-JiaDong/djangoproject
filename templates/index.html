@@ -3,17 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>首页</title>
-</head>
-<body>
-    首页
-    &nbsp;&nbsp;&nbsp;&nbsp;<a href="/login/">登陆</a>
-    &nbsp;&nbsp;&nbsp;&nbsp;<a href="/newuser/">注册</a>
-{% if request.session.user %}
-    <a href="/userlist/">用户管理</a>
-    <a href="/goclasslist/">类别管理</a>
-    <a href="/gobloglist/">博客管理</a>
-    <img src="{{  request.session.user.userPic }}" height="200" width="117">
-{% endif %}
+    <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js" ></script>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css" />
 
-</body>
+</head>
+    <body>
+        <h1 align="center">首页</h1>
+        {% if not request.session.user %}
+        &nbsp;<a href="/login/"class="btn btn-default ">登陆</a>
+         <a href="/newuser/"class="btn btn-default ">注册</a>
+        {% endif %}
+    {% if request.session.user %}
+        <h2>{{  request.session.user.userName }}</h2>
+        <img src="{{  request.session.user.userPic }}" height="200" >
+        </br>
+        <a href="/userlist/" class="btn btn-default ">用户管理</a>
+        <a href="/goclasslist/" class="btn btn-default ">类别管理</a>
+        <a href="/gobloglist/" class="btn btn-default ">博客管理</a>
+    {% endif %}
+    </body>
 </html>

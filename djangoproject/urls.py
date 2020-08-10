@@ -45,7 +45,7 @@ urlpatterns = [
     path('gowriteblog/', blogview.goWriteBlog),
     path('upload/', blogview.uploadFile),
     path('goupdateblog/', blogview.goUpdateBlog),
-    # path('goindex/', authview.goIndex),
+    path('goindex/', authview.goIndex),
     # path('logout/', authview.logout),
     # path('viewblog/', blogview.viewBlog),
 

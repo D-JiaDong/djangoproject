@@ -72,8 +72,8 @@ function blog(pageSize, currentPage, blogId, opr){
                     bodyObj.append(text)
 
                     // 实现分页显示
-                    foot_choose_Obj = $('#pagechoose')
-                    foot_choose_Obj.empty()
+                    footObj = $('#pageData')
+                    footObj.empty()
                     pageText = ' <tr align="right">' +
                         '                <td colspan="8">' +
                         '                   总共有' + params.counts + '条 总共有' + params.totalPage + '页' +
@@ -82,22 +82,18 @@ function blog(pageSize, currentPage, blogId, opr){
                         '                    <a href="javascript:blog(' + params.pageSize + ',' + (params.currentPage <= 1 ? 1 : params.currentPage - 1) + ' , ' + params.totalPage + ',\'search\')" >上一页</a>' +
                         '                    <a href="javascript:blog(' + params.pageSize + ',' + (params.currentPage >= params.totalPage ? params.totalPage : params.currentPage + 1) + ' , ' + params.totalPage + ',\'search\')" >下一页</a>' +
                         '                    <a href="javascript:blog(' + params.pageSize + ',' + params.totalPage + ' , ' + params.totalPage + ',\'search\')">尾页</a>' +
-                        '                </td>' +
-                        '            </tr>'
-                    foot_choose_Obj.append(pageText) // DOM  innerHTML
-
-                    //实现多页选择
-                    foot_fy_Obj = $('#pagenum')
-                    foot_fy_Obj.empty()
-                    pageText = '                    <option value=\'3\'>3</option>' +
+                         '                    <select name="pageSize" id="pageSize">' +
+                        '                    <option value=\'3\'>3</option>' +
                         '                    <option value=\'20\' >20</option>' +
                         '                        <option value=\'50\' >50</option>' +
-                        '                        <option value=\'100\'>100</option>'
-                    foot_fy_Obj.append(pageText)
+                        '                        <option value=\'100\'>100</option>'+
+                         '                    </select>' +
+                        '                </td>' +
+                        '            </tr>'
+                    footObj.append(pageText) // DOM  innerHTML
 
 
-
-                    var obj = document.getElementById('pagenum');
+                    var obj = document.getElementById('pageSize');
                     for (i = 0; i < obj.length; i++) {
                         if (obj[i].value == params.pageSize)
                             obj[i].selected = true;

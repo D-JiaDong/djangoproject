@@ -7,11 +7,14 @@ from dao.userDao import UserDao
 #作为整个网站的入口
 def index(request):
     return render(request,'index.html')
+def goIndex(request):
+    return render(request, 'admin/index.html')
+    pass
 
 
 #跳转登陆页
 def gologin(request):
-    return render(request,'login.html')
+    return render(request, 'admin/login.html')
 
 #跳转注册页面
 def goNewUser(request):
@@ -50,7 +53,7 @@ def reNewUser(request):
     userDao.close()
     #如果写入成功 跳转到登陆页
     if result==1:
-        return render(request,'login.html',{'success':1 })
+        return render(request, 'admin/login.html', {'success':1})
         pass
     else:
         return render(request,'newuser.html',{'success':0})
@@ -87,7 +90,7 @@ def login(request):
         user['userId']=result[0]['userid']
         user['userPic']=result[0]['userpic']
         request.session['user']=user
-        return render(request,'index.html')
+        return render(request,'admin/index.html')
     else:
         return redirect('/login/')
     pass

@@ -5,9 +5,8 @@ import json
 # Create your views here.
 
 def goBlogClass(request):
-    return render(request, 'blog/blogclass.html')
+    return render(request, 'admin/blog/blogclass.html')
     pass
-
 
 def getBlogClass(request):
     dictObj = json.loads(request.body.decode('utf-8'),strict=False)
@@ -81,7 +80,7 @@ def getBlogClass(request):
 
 # 博客管理
 def goBlogList(request):
-    return render(request, 'blog/blog.html')
+    return render(request, 'admin/blog/blog.html')
     pass
 # AJAX异步技术实现CRUD
 def blogList(request):
@@ -246,14 +245,14 @@ def blogList(request):
 
 #写博客页面
 def goWriteBlog(request):
-    return render(request, 'blog/writeblog.html')
+    return render(request, 'admin/blog/writeblog.html')
     pass
 
 def goUpdateBlog(request):
     blogId = request.GET.get('blogId', 0)
     params = {}
     params['blogId'] = blogId
-    return render(request, 'blog/updateblog.html', {'params': params})
+    return render(request, 'admin/blog/updateblog.html', {'params': params})
     pass
 
 import os

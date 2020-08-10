@@ -34,7 +34,7 @@ def getUserList(request):
     #查询用户的个人信息
     if opr=='update':
         uUser=userDao.findUserByUserId([userId])
-        return render(request,'sysmgr/updateuser.html',{'params':params,'uUser':uUser})
+        return render(request, 'admin/sysmgr/updateuser.html', {'params':params, 'uUser':uUser})
         pass
 
 
@@ -66,4 +66,4 @@ def getUserList(request):
     userList=userDao.findPageUserList(params)
     userDao.commit()
     userDao.close()
-    return render(request,'sysmgr/userinfo.html',{'userList':userList,'params': params})
+    return render(request, 'admin/sysmgr/userinfo.html', {'userList':userList, 'params': params})
