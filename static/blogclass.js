@@ -16,6 +16,8 @@ function blogClass(pageSize, currentPage, classId, opr){
         currentPage = document.classForm.currentPage.value
         classId = document.classForm.cId.value
     }
+
+
     //  $ == jQuery  JSON对象
     $.ajax({
             url:'/classlist/',

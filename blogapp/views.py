@@ -88,6 +88,7 @@ def blogList(request):
 
 
     # 获取查询条件
+    userName=dictObj.get('userName','')
     blogTitle = dictObj.get('blogTitle', '')
     blogState = dictObj.get('blogState', '')
     blogContent = dictObj.get('blogContent', '')
@@ -242,10 +243,99 @@ def blogList(request):
 
     return HttpResponse(json.dumps({'data': blogList, 'params': params}), content_type='application/json')
     pass
+#byuser查询
+def userblogList(request):
+    dictObj = json.loads(request.body.decode('utf-8')) # {'classid':1, 'className': 'Python', 'opr':'del'}
 
+
+    # 获取查询条件
+    userId=dictObj.get('userId','')
+    blogTitle = dictObj.get('blogTitle', '')
+    blogState = dictObj.get('blogState', '')
+    blogContent = dictObj.get('blogContent', '')
+    blogTips = dictObj.get('blogTips', '')
+    blogClassId = dictObj.get('blogClassId', '')
+    blogId = dictObj.get('blogId', '')
+    opr = dictObj.get('opr', '')
+    pageSize = dictObj.get('pageSize', 0)
+    currentPage = dictObj.get('currentPage', 0)
+
+    if pageSize == 0 or pageSize == "":
+        pageSize = 3
+        pass
+    if currentPage == 0 or currentPage == "":
+        currentPage = 1
+        pass
+
+    tBlog = TBlog()
+    blogClassDao = BlogClassDao()
+    blogClassList = blogClassDao.findAllClassList()
+
+    params = {'blogTitle': blogTitle,
+              'blogState': blogState,
+              'pageSize': int(pageSize),
+              'currentPage': int(currentPage),
+              'blogClassList': blogClassList}
+
+    # 计算两个值：startRow
+    startRow = (int(currentPage) - 1) * int(pageSize)
+    endRow = int(currentPage) * int(pageSize)
+    params['startRow'] = startRow
+    print(userId)
+    print("asdfasd")
+    counts=None
+    blogList=[]
+    querySet = TBlog.objects
+    if blogTitle and blogState:
+        print(blogTitle)
+        # blogtitle__contains 模糊查询
+        blogList = list(querySet.filter(blogtitle__contains=blogTitle,blogstate=blogState,userid=userId).values('blogid',
+                                    'blogtitle',
+                                    'blogsummary',
+                                    'blogtips',
+                                    'userid__username',
+                                    'classid__classname',
+                                    'blogstate')[startRow: endRow])
+        counts = querySet.count()
+        pass
+    elif blogState:
+        blogList = list(querySet.filter(blogstate=blogState,userid=userId).values('blogid',
+                                    'blogtitle',
+                                    'blogsummary',
+                                    'blogtips',
+                                    'userid__username',
+                                    'classid__classname',
+                                    'blogstate')[startRow: endRow])
+        counts = querySet.count()
+        pass
+    else:
+        blogList = list(querySet.filter(blogtitle__contains=blogTitle,userid=userId).values('blogid',
+                                    'blogtitle',
+                                    'blogsummary',
+                                    'blogtips',
+                                    'userid__username',
+                                    'classid__classname',
+                                    'blogstate')[startRow: endRow])
+        counts = querySet.count()
+        pass
+
+
+    totalPage = counts // int(pageSize) if counts % int(pageSize) == 0 else counts // int(pageSize) + 1
+    params['counts'] = counts
+    params['totalPage'] = totalPage
+    currentPage = int(currentPage) if int(currentPage)<totalPage else totalPage
+    currentPage = 1 if currentPage <= 0 else currentPage
+    params['currentPage'] = currentPage
+
+    print(blogList)
+    return HttpResponse(json.dumps({'data': blogList, 'params': params}), content_type='application/json')
+    pass
 #写博客页面
 def goWriteBlog(request):
     return render(request, 'admin/blog/writeblog.html')
+    pass
+def usergoWriteBlog(request):
+    return render(request, 'user/blog/writeblog.html')
     pass
 
 def goUpdateBlog(request):
@@ -254,6 +344,14 @@ def goUpdateBlog(request):
     params['blogId'] = blogId
     return render(request, 'admin/blog/updateblog.html', {'params': params})
     pass
+
+def usergoUpdateBlog(request):
+    blogId = request.GET.get('blogId', 0)
+    params = {}
+    params['blogId'] = blogId
+    return render(request, 'user/blog/updateblog.html', {'params': params})
+    pass
+
 
 import os
 import uuid
@@ -277,5 +375,71 @@ def uploadFile(request):
     pass
 
 
+def viewBlog(request):
+    blogId = request.GET.get('blogId', 0)
+    uBlog = TBlog.objects.filter(blogid=blogId).values('blogid', 'blogtitle', 'blogcontent', 'blogtips', 'classid', 'classid__classname')
+    print(blogId)
 
+    # if uBlog:
+    #     uBlog = uBlog[0]
+    # # 加入基于内容的推荐功能
+    # # 1.查找最近的100篇同类型的博客
+    # blogList = list(TBlog.objects.filter(classid=uBlog['classid']).values('blogid', 'blogtitle', 'blogcontent',  'blogsummary', 'blogtips', 'classid', 'classid__classname')[0:100])
+    #
+    # content = uBlog['blogcontent']
+    # content = content.replace('<p>', '')
+    # content = content.replace('</p>', '')
+    #
+    # contentList = []
+    # contentList.append(' '.join(jieba.cut(content))) # 我是中国人['我','是','中国人']  -> 我 是  中国人
+    # # 分词
+    # for ct in blogList:
+    #     cc = ct['blogcontent']
+    #     cc = cc.replace('<p>', '')
+    #     cc = cc.replace('</p>', '')
+    #     contentList.append(' '.join(jieba.cut(cc)))
+    #     pass
+    #
+    # vectorizer = CountVectorizer()
+    #
+    # # 传入词库，用于统计词库和词数
+    # tf = vectorizer.fit_transform(contentList)
+    #
+    # # 得到词库。词汇表
+    # words = vectorizer.get_feature_names()
+    # print(words)
+    #
+    # # 查看词频统计
+    # print(tf.toarray())  #
+    #
+    # tfidfTransformer = TfidfTransformer()
+    #
+    # # 计算tf-idf
+    # tfidf = tfidfTransformer.fit_transform(tf)
+    # # 查看每句话的tf-idf值
+    # print(tfidf.toarray())
+    #
+    # from sklearn.metrics.pairwise import linear_kernel
+    #
+    # # 通过向量的余弦相似度，计算出第一个文本和所有其他文本之间的相似度（注意此处包含了自己）
+    # cosine_similarities = linear_kernel(tfidf[0:1], tfidf).flatten()
+    # print(cosine_similarities)
+    #
+    # similarList = []
+    # for i in range(1, len(cosine_similarities)):
+    #     if cosine_similarities[i] > 0.3 and blogList[i - 1]['blogid'] != int(blogId):
+    #         similarList.append(blogList[i - 1])
+    #         pass
+    #     pass
+    # # 作业：排序
 
+    return render(request, 'user/viewblog.html', {'uBlog': uBlog[0]})
+    pass
+
+def BlogShow(request):
+    return render(request, 'user/blogshow.html')
+    pass
+
+def MyBlogShow(request):
+    return render(request, 'user/myblogshow.html')
+    pass

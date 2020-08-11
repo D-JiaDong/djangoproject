@@ -30,23 +30,35 @@ urlpatterns = [
     # path('reslink/<int:userid>/<str:userage>/', restlink),
     # path('',userlogin),
 
+    #主页面
     path('',authview.index),
+    #转登陆页面
     path('login/', authview.gologin),
+    path('ulogin/', authview.goUserlogin),
+    #转注册页面
     path('newuser/', authview.goNewUser),
     path('regnewuser/', authview.reNewUser),
+    #验证登陆
     path('slogin/', authview.login),
+    path('uslogin/', authview.userlogin),
     path('checkUserName/',authview.checkUserName),
+
     path('userlist/', sysview.getUserList),
     path('goclasslist/',blogview.goBlogClass),
     path('classlist/', blogview.getBlogClass),
     path('gobloglist/', blogview.goBlogList),
     path('bloglist/', blogview.blogList),
+    path('userbloglist/', blogview.userblogList),
 
     path('gowriteblog/', blogview.goWriteBlog),
+    path('usergowriteblog/', blogview.usergoWriteBlog),
     path('upload/', blogview.uploadFile),
     path('goupdateblog/', blogview.goUpdateBlog),
+    path('usergoupdateblog/', blogview.usergoUpdateBlog),
     path('goindex/', authview.goIndex),
-    # path('logout/', authview.logout),
-    # path('viewblog/', blogview.viewBlog),
+    path('logout/', authview.logout),
+    path('viewblog/', blogview.viewBlog),
+    path('goUBlog/', blogview.BlogShow),
+    path('goMyBlog/', blogview.MyBlogShow),
 
 ]

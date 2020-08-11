@@ -15,6 +15,9 @@ def goIndex(request):
 #跳转登陆页
 def gologin(request):
     return render(request, 'admin/login.html')
+#跳转登陆页
+def goUserlogin(request):
+    return render(request, 'user/login.html')
 
 #跳转注册页面
 def goNewUser(request):
@@ -59,7 +62,7 @@ def reNewUser(request):
         return render(request,'newuser.html',{'success':0})
 
 import json
-#用户登陆
+#判断username是否重复
 def checkUserName(request):
     print("asdfasdf")
     dictObj=json.loads(request.body.decode('utf-8'))
@@ -74,7 +77,12 @@ def checkUserName(request):
     return HttpResponse(json.dumps(rDict),content_type='application/json')
     pass
 
-# 用户登陆
+#退出登陆
+def logout(request):
+    request.session.flush()
+    return redirect('/login/')
+    pass
+# 管理员登陆
 def login(request):
     userName = request.POST.get('userName', '')
     userPwd = request.POST.get('userPwd', '')
@@ -84,14 +92,37 @@ def login(request):
     userDao=UserDao()
     result=userDao.loginParams([userName,userPwd])
     userDao.close()
-    if result:
+    if result and result[0]['role']==1:
         user={}
         user['userName']=userName
         user['userId']=result[0]['userid']
         user['userPic']=result[0]['userpic']
+        user['Role']=result[0]['role']
         request.session['user']=user
         return render(request,'admin/index.html')
     else:
         return redirect('/login/')
     pass
+# 用户登陆
+def userlogin(request):
+    userName = request.POST.get('userName', '')
+    userPwd = request.POST.get('userPwd', '')
+    remeberme=request.POST.get('remeberme','')
+    #密码加密处理
+    userPwd = hashlib.md5(userPwd.encode(encoding='utf-8')).hexdigest()
+    userDao=UserDao()
+    result=userDao.loginParams([userName,userPwd])
+    userDao.close()
+    if result  and result[0]['role']==2:
+        user={}
+        user['userName']=userName
+        user['userId']=result[0]['userid']
+        user['userPic']=result[0]['userpic']
+        user['Role']=result[0]['role']
+        request.session['user']=user
+        return render(request,'user/index.html')
+    else:
+        return redirect('/ulogin/')
+    pass
+
 
