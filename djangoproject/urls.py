@@ -61,4 +61,7 @@ urlpatterns = [
     path('goUBlog/', blogview.BlogShow),
     path('goMyBlog/', blogview.MyBlogShow),
 
+    path('gorolelist/', blogview.goRoleList),
+    path('rolelist/', blogview.RoleList),
+
 ]

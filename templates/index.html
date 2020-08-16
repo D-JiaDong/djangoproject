@@ -10,9 +10,12 @@
     <body>
         <h1 align="center">首页</h1>
 {#        {% if not request.session.user %}#}
-            <a href="/login/"class="btn btn-default ">管理员登陆</a>
+        <div align="center">
+             <a href="/login/"class="btn btn-default ">管理员登陆</a>
             <a href="/ulogin/"class="btn btn-default ">用户登陆</a>
             <a href="/newuser/"class="btn btn-default ">用户注册</a>
+        </div>
+
 {#        {% endif %}#}
 {#    {% if request.session.user %}#}
 {#        <h2>{{  request.session.user.userName }}</h2>#}

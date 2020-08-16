@@ -55,7 +55,26 @@
                         </div><!-- end col-->
                     </div>
                     <!-- end row-->
+                     <table  class="table activate-select dt-responsive nowrap"border="1" width="800">
+                        <caption>
 
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th colspan="4" align="center">相关推荐</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in similarList %}
+                            <tr onclick='javascript:document.location.href="/viewblog/?blogId="+ {{item.blogid}};'>
+                                <td>{{ item.blogtitle}}</td>
+                                <td>{{ item.blogsummary }}</td>
+                                <td>{{ item.blogtips }}</td>
+                                <td>{{ item.classid__classname }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                     </table>
                 </div> <!-- container-fluid -->
             </div>
             <!-- End Page-content -->

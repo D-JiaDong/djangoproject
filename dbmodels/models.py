@@ -41,7 +41,7 @@ class TUser(models.Model):
     userpic = models.CharField(max_length=255, blank=True, null=True)
     userintro = models.CharField(max_length=512, blank=True, null=True)
     userstate = models.IntegerField(blank=True, null=True)
-
+    role = models.IntegerField(blank=True, null=True)
     class Meta:
         managed = False
         db_table = 't_user'

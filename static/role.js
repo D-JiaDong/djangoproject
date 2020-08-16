@@ -1,5 +1,7 @@
-function blog(pageSize, currentPage, blogId, opr) {
-    cName = document.classForm.blogTitle.value
+function role(pageSize, currentPage, blogId, opr) {
+    userId = document.classForm.userId.value
+    userName=document.classForm.userName.value
+    userRole=document.classForm.userRole.value
 
     // if (document.classForm.pageSize.value)
     //     pageSize=document.classForm.pageSize.value
@@ -23,14 +25,15 @@ function blog(pageSize, currentPage, blogId, opr) {
     }
     //  $ == jQuery  JSON对象
     $.ajax({
-            url: '/bloglist/',
+            url: '/rolelist/',
             type: 'POST',
             data: JSON.stringify({
-                blogTitle: cName,
+                userId: userId,
+                userName:userName,
+                userRole:userRole,
                 pageSize: pageSize,
                 currentPage: currentPage,
                 blogState: state,
-                blogId: blogId,
                 opr: opr,
             }),
             dataType: 'json',
@@ -44,30 +47,21 @@ function blog(pageSize, currentPage, blogId, opr) {
                     text = ""
                     bodyObj.empty()
                     for (i = 0; i < data.data.length; i++) {
-                        text += "<tr><td>" + data.data[i].blogid + "</td>" +
-                            "<td>" + data.data[i].blogtitle + "</td>" +
-                            "<td>" + data.data[i].blogsummary + "</td>" +
-                            "<td>" + data.data[i].blogtips + "</td>" +
-                            "<td>" + data.data[i].classid__classname + "</td>" +
-                            "<td>" + data.data[i].userid__username + "</td>"
-                        if (data.data[i].blogstate == 1) {
-                            text += "<td>已发布</td>"
-                        } else if (data.data[i].blogstate == 2) {
-                            text += "<td>审核中</td>"
-                        } else if (data.data[i].blogstate == 3) {
-                            text += "<td>草稿</td>"
-                        } else if (data.data[i].blogstate == 4) {
-                            text += "<td>已撤销</td>"
-                        } else {
-                            text += "<td>0</td>"
+                        text += "<tr><td>" + data.data[i].userid + "</td>" +
+                            "<td>" + data.data[i].username + "</td>" +
+                            "<td>" + data.data[i].role + "</td>"
+                        if (data.data[i].role == 1) {
+                            text += "<td>管理员</td>"
+                        } else if (data.data[i].role == 2) {
+                            text += "<td>普通用户</td>"
                         }
 
-                        text += "<td>" +
-                            "<button type='button'  class='btn-primary btn-sm' onclick=\"javascript:document.location.href='/goupdateblog/?blogId=" + data.data[i].blogid + "&opr=update\';\">修改</button>" +
-                            "<button  type='button'  class='btn-info btn-sm' onclick=\"blog(" + params.pageSize + ',' + params.currentPage + ' , ' + data.data[i].blogid + ",'publish')\">发布</button>" +
-                            "<button  type='button'  class='btn-danger btn-sm' onclick=\"blog(" + params.pageSize + ',' + params.currentPage + ' , ' + data.data[i].blogid + ",'cancel')\">撤销</button>" +
-                            "</td>" +
-                            "</tr>"
+                        // text += "<td>" +
+                        //     "<button type='button'  class='btn-primary btn-sm' onclick=\"javascript:document.location.href='/goupdateblog/?blogId=" + data.data[i].blogid + "&opr=update\';\">修改</button>" +
+                        //     "<button  type='button'  class='btn-info btn-sm' onclick=\"role(" + params.pageSize + ',' + params.currentPage + ' , ' + data.data[i].blogid + ",'publish')\">发布</button>" +
+                        //     "<button  type='button'  class='btn-danger btn-sm' onclick=\"role(" + params.pageSize + ',' + params.currentPage + ' , ' + data.data[i].blogid + ",'cancel')\">撤销</button>" +
+                        //     "</td>" +
+                        //     "</tr>"
                     }
                     bodyObj.append(text)
 
@@ -78,10 +72,10 @@ function blog(pageSize, currentPage, blogId, opr) {
                         '                <td colspan="8">' +
                         '                   总共有' + params.counts + '条 总共有' + params.totalPage + '页' +
                         '                   当前第' + params.currentPage + '页' +
-                        '                    <a href="javascript:blog(' + params.pageSize + ',' + 1 + ' , ' + params.totalPage + ',\'search\')" >首页</a>' +
-                        '                    <a href="javascript:blog(' + params.pageSize + ',' + (params.currentPage <= 1 ? 1 : params.currentPage - 1) + ' , ' + params.totalPage + ',\'search\')" >上一页</a>' +
-                        '                    <a href="javascript:blog(' + params.pageSize + ',' + (params.currentPage >= params.totalPage ? params.totalPage : params.currentPage + 1) + ' , ' + params.totalPage + ',\'search\')" >下一页</a>' +
-                        '                    <a href="javascript:blog(' + params.pageSize + ',' + params.totalPage + ' , ' + params.totalPage + ',\'search\')">尾页</a>' +
+                        '                    <a href="javascript:role(' + params.pageSize + ',' + 1 + ' , ' + params.totalPage + ',\'search\')" >首页</a>' +
+                        '                    <a href="javascript:role(' + params.pageSize + ',' + (params.currentPage <= 1 ? 1 : params.currentPage - 1) + ' , ' + params.totalPage + ',\'search\')" >上一页</a>' +
+                        '                    <a href="javascript:role(' + params.pageSize + ',' + (params.currentPage >= params.totalPage ? params.totalPage : params.currentPage + 1) + ' , ' + params.totalPage + ',\'search\')" >下一页</a>' +
+                        '                    <a href="javascript:role(' + params.pageSize + ',' + params.totalPage + ' , ' + params.totalPage + ',\'search\')">尾页</a>' +
                         '                    <select name="pageSize" id="pageSize">' +
                         '                    <option value=\'3\'>3</option>' +
                         '                    <option value=\'20\' >20</option>' +
@@ -106,6 +100,6 @@ function blog(pageSize, currentPage, blogId, opr) {
 }
 $(document).ready(
     function(){
-        blog(3,1,0,"search")
+        role(3,1,0,"search")
     }
 )

@@ -1,0 +1,104 @@
+{% include 'admin/header.html' %}
+
+{% include 'admin/left.html' %}
+{% include 'admin/topbar.html' %}
+
+    <div class="main-content">
+
+            <div class="page-content">
+                <div class="container-fluid">
+
+                    <!-- start page title -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="page-title-box d-flex align-items-center justify-content-between">
+                                <h4 class="mb-0 font-size-18">角色管理</h4>
+
+                                <div class="page-title-right">
+                                    <ol class="breadcrumb m-0">
+                                        <li class="breadcrumb-item"><a href="javascript: void(0);">角色管理</a></li>
+                                        <li class="breadcrumb-item active">角色管理</li>
+                                    </ol>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end page title -->
+
+                    <div class="row">
+                        <div class="col-12">
+                             <div class="card">
+                                <div class="card-body">
+                                    <form action="#" method="post" name="classForm" >
+                                       <div align="center">
+{#                                                        <label for="userId"  class="control-label" style="display: inline;">用户ID:</label>#}
+                                               用户ID<input type="text" name="userId" />
+
+{#                                                     <label for="userName"  class="control-label" style="display: inline;">用户名:</label>#}
+                                               用户姓名<input type="text" name="userName" />
+
+{#                                                     <label for="userRole"  class="control-label" style="display: inline;">用户角色:</label>#}
+                                               用户角色<input type="text" name="userRole" />
+                                            <input type="reset" class="btn btn-default pull-left" onclick="clearSearch()"value="取消"></input>
+                                            <input type="button" class="btn btn-primary" onclick="role(3, 1, 0, 'search')"value="查询"></input>
+                                        </div>
+                                        <input type="hidden" name="currentPage" value="1"/>
+                                        <input type="hidden" name="opr" value="search"/>
+                                        <table class="table activate-select dt-responsive nowrap" >
+                                            <thead>
+                                                <tr>
+                                                    <th>用户ID</th>
+                                                    <th>用户姓名</th>
+                                                    <th>用户角色</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="bodyData">
+
+                                            </tbody>
+                                {#            <tfoot id="pageData">#}
+                                {#            </tfoot>#}
+                                             <tfoot id="pageData">
+{#                                            <tr align="right">#}
+{#                                                <td colspan="8" >#}
+{#                                                    <div style="float: right">#}
+{#                                                        <select name="pageSize" id="pagenum">#}
+{#                                                        </select>#}
+{#                                                    </div>#}
+{#                                                    <div style="float: right" id="pagechoose" ></div>#}
+{#                                                </td>#}
+{#                                            </tr>#}
+                                             </tfoot>
+                                        </table>
+                                    </form>
+                                </div> <!-- end card body-->
+                            </div> <!-- end card -->
+                        </div><!-- end col-->
+                    </div>
+                    <!-- end row-->
+
+                </div> <!-- container-fluid -->
+            </div>
+            <!-- End Page-content -->
+
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            2020 © Opatix.
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-sm-right d-none d-sm-block">
+                                Design & Develop by Myra
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+
+        </div>
+        <!-- end main content-->
+
+{% include 'admin/bottom.html' %}
+<script type="text/javascript" src="/static/role.js" ></script>

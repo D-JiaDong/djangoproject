@@ -77,11 +77,14 @@ def getBlogClass(request):
     return HttpResponse(json.dumps({'data': classList, 'params': params},ensure_ascii=False), content_type='application/json')
     pass
 
-
 # 博客管理
 def goBlogList(request):
     return render(request, 'admin/blog/blog.html')
     pass
+def goRoleList(request):
+    return render(request, 'admin/role_html/role.html')
+    pass
+
 # AJAX异步技术实现CRUD
 def blogList(request):
     dictObj = json.loads(request.body.decode('utf-8')) # {'classid':1, 'className': 'Python', 'opr':'del'}
@@ -166,7 +169,7 @@ def blogList(request):
         tBlogclass.classid = int(blogClassId)
 
         # 摘要信息
-        blogsummary = blogContent[0:300].replace('<p>', '')
+        blogsummary = blogContent[0:100].replace('<p>', '')
         blogsummary = blogsummary.replace('</p>', '')
 
         # 用户信息
@@ -175,7 +178,7 @@ def blogList(request):
         sessionUser = request.session['user']
         tUser.userid = sessionUser['userId']
 
-        print(blogContent)
+        print(blogsummary)
         # ORM框架的外键列必须传对象
         result = TBlog.objects.create(blogtitle=blogTitle,
                                       blogcontent=blogContent,
@@ -231,6 +234,78 @@ def blogList(request):
                                     'blogstate')[startRow: endRow])
         counts = querySet.count()
         pass
+
+
+    totalPage = counts // int(pageSize) if counts % int(pageSize) == 0 else counts // int(pageSize) + 1
+    params['counts'] = counts
+    params['totalPage'] = totalPage
+    currentPage = int(currentPage) if int(currentPage)<totalPage else totalPage
+    currentPage = 1 if currentPage <= 0 else currentPage
+    params['currentPage'] = currentPage
+
+
+    return HttpResponse(json.dumps({'data': blogList, 'params': params}), content_type='application/json')
+    pass
+
+
+
+def RoleList(request):
+    print("asdfasdf")
+    dictObj = json.loads(request.body.decode('utf-8')) # {'classid':1, 'className': 'Python', 'opr':'del'}
+
+
+    # 获取查询条件
+    userName=dictObj.get('userName','')
+    userId=dictObj.get('userId','')
+    userRole=dictObj.get('userRole','')
+    opr = dictObj.get('opr', '')
+    pageSize = dictObj.get('pageSize', 0)
+    currentPage = dictObj.get('currentPage', 0)
+
+    if pageSize == 0 or pageSize == "":
+        pageSize = 3
+        pass
+    if currentPage == 0 or currentPage == "":
+        currentPage = 1
+        pass
+
+
+
+    params = {'userid':userId ,
+              'username': userName,
+              'userRole':userRole,
+              'pageSize': int(pageSize),
+              'currentPage': int(currentPage),
+              }
+
+
+    # 计算两个值：startRow
+    startRow = (int(currentPage) - 1) * int(pageSize)
+    endRow = int(currentPage) * int(pageSize)
+    params['startRow'] = startRow
+
+    counts=None
+    blogList=[]
+    querySet = TUser.objects
+    if userId:
+        # blogtitle__contains 模糊查询
+        querySet = querySet.filter(userid=userId)
+    if userName:
+        # blogtitle__contains 模糊查询
+        querySet=querySet.filter(username=userName)
+        pass
+    if userRole:
+        # blogtitle__contains 模糊查询
+        querySet = querySet.filter(role=userRole)
+        pass
+
+    blogList = list(querySet.values('userid',
+        'username',
+        'role',
+        )[startRow: endRow])
+    print(blogList)
+    counts = querySet.count()
+    pass
 
 
     totalPage = counts // int(pageSize) if counts % int(pageSize) == 0 else counts // int(pageSize) + 1
@@ -375,65 +450,68 @@ def uploadFile(request):
     pass
 
 
+import jieba
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 def viewBlog(request):
+    print('view')
     blogId = request.GET.get('blogId', 0)
     uBlog = TBlog.objects.filter(blogid=blogId).values('blogid', 'blogtitle', 'blogcontent', 'blogtips', 'classid', 'classid__classname')
     print(blogId)
 
-    # if uBlog:
-    #     uBlog = uBlog[0]
-    # # 加入基于内容的推荐功能
-    # # 1.查找最近的100篇同类型的博客
-    # blogList = list(TBlog.objects.filter(classid=uBlog['classid']).values('blogid', 'blogtitle', 'blogcontent',  'blogsummary', 'blogtips', 'classid', 'classid__classname')[0:100])
-    #
-    # content = uBlog['blogcontent']
-    # content = content.replace('<p>', '')
-    # content = content.replace('</p>', '')
-    #
-    # contentList = []
-    # contentList.append(' '.join(jieba.cut(content))) # 我是中国人['我','是','中国人']  -> 我 是  中国人
-    # # 分词
-    # for ct in blogList:
-    #     cc = ct['blogcontent']
-    #     cc = cc.replace('<p>', '')
-    #     cc = cc.replace('</p>', '')
-    #     contentList.append(' '.join(jieba.cut(cc)))
-    #     pass
-    #
-    # vectorizer = CountVectorizer()
-    #
-    # # 传入词库，用于统计词库和词数
-    # tf = vectorizer.fit_transform(contentList)
-    #
-    # # 得到词库。词汇表
-    # words = vectorizer.get_feature_names()
-    # print(words)
-    #
-    # # 查看词频统计
-    # print(tf.toarray())  #
-    #
-    # tfidfTransformer = TfidfTransformer()
-    #
-    # # 计算tf-idf
-    # tfidf = tfidfTransformer.fit_transform(tf)
-    # # 查看每句话的tf-idf值
-    # print(tfidf.toarray())
-    #
-    # from sklearn.metrics.pairwise import linear_kernel
-    #
-    # # 通过向量的余弦相似度，计算出第一个文本和所有其他文本之间的相似度（注意此处包含了自己）
-    # cosine_similarities = linear_kernel(tfidf[0:1], tfidf).flatten()
-    # print(cosine_similarities)
-    #
-    # similarList = []
-    # for i in range(1, len(cosine_similarities)):
-    #     if cosine_similarities[i] > 0.3 and blogList[i - 1]['blogid'] != int(blogId):
-    #         similarList.append(blogList[i - 1])
-    #         pass
-    #     pass
-    # # 作业：排序
+    if uBlog:
+        uBlog = uBlog[0]
+    # 加入基于内容的推荐功能
+    # 1.查找最近的100篇同类型的博客
+    blogList = list(TBlog.objects.filter(classid=uBlog['classid']).values('blogid', 'blogtitle', 'blogcontent',  'blogsummary', 'blogtips', 'classid', 'classid__classname')[0:100])
 
-    return render(request, 'user/viewblog.html', {'uBlog': uBlog[0]})
+    content = uBlog['blogcontent']
+    content = content.replace('<p>', '')
+    content = content.replace('</p>', '')
+
+    contentList = []
+    contentList.append(' '.join(jieba.cut(content))) # 我是中国人['我','是','中国人']  -> 我 是  中国人
+    # 分词
+    for ct in blogList:
+        cc = ct['blogcontent']
+        cc = cc.replace('<p>', '')
+        cc = cc.replace('</p>', '')
+        contentList.append(' '.join(jieba.cut(cc)))
+        pass
+
+    vectorizer = CountVectorizer()
+
+    # 传入词库，用于统计词库和词数
+    tf = vectorizer.fit_transform(contentList)
+
+    # 得到词库。词汇表
+    words = vectorizer.get_feature_names()
+    print(words)
+
+    # 查看词频统计
+    print(tf.toarray())  #
+
+    tfidfTransformer = TfidfTransformer()
+
+    # 计算tf-idf
+    tfidf = tfidfTransformer.fit_transform(tf)
+    # 查看每句话的tf-idf值
+    print(tfidf.toarray())
+
+    from sklearn.metrics.pairwise import linear_kernel
+
+    # 通过向量的余弦相似度，计算出第一个文本和所有其他文本之间的相似度（注意此处包含了自己）
+    cosine_similarities = linear_kernel(tfidf[0:1], tfidf).flatten()
+    print(cosine_similarities)
+
+    similarList = []
+    for i in range(1, len(cosine_similarities)):
+        if cosine_similarities[i] > 0.1 and blogList[i - 1]['blogid'] != int(blogId):
+            similarList.append(blogList[i - 1])
+            pass
+        pass
+    # 作业：排序
+
+    return render(request, 'user/viewblog.html', {'uBlog': uBlog, 'similarList': similarList})
     pass
 
 def BlogShow(request):
